@@ -295,6 +295,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Send Message</button>
                     </form>
+                    <div id="responseMessage" style="margin-top: 20px; font-weight: bold;"></div>
                 </div>
             </div>
         </div>
@@ -324,6 +325,32 @@
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
+            });
+        });
+
+        // Contact form submission
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(this);
+            const responseMessage = document.getElementById('responseMessage');
+
+            fetch('contact.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                responseMessage.innerHTML = data;
+                responseMessage.style.color = data.includes('successfully') ? 'green' : 'red';
+                // Clear the form on success
+                if (data.includes('successfully')) {
+                    this.reset();
+                }
+            })
+            .catch(error => {
+                responseMessage.innerHTML = 'An error occurred. Please try again.';
+                responseMessage.style.color = 'red';
             });
         });
     </script>
