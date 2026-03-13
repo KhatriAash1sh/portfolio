@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Link to external CSS file -->
     <link rel="stylesheet" href="style.css">
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/emailjs.min.js"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -280,7 +282,7 @@
                     </div>
                 </div>
                 <div class="contact-form">
-                    <form id="contactForm" action="contact.php" method="POST">
+                    <form id="contactForm">
                         <div class="form-group">
                             <input type="text" name="name" placeholder="Your Name" required>
                         </div>
@@ -328,28 +330,34 @@
             });
         });
 
-        // Contact form submission
+        // Contact form submission with EmailJS
+        (function() {
+            // Initialize EmailJS with your public key
+            emailjs.init("HUUY0HDW5be6NVuub");
+        })();
+
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent default form submission
 
-            const formData = new FormData(this);
             const responseMessage = document.getElementById('responseMessage');
+            responseMessage.innerHTML = 'Sending...';
+            responseMessage.style.color = 'blue';
 
-            fetch('contact.php', {
-                method: 'POST',
-                body: formData
+            // Send email using EmailJS
+            emailjs.send("service_xczx5vg", "template_dha6sa3", {
+                from_name: this.name.value,
+                from_email: this.email.value,
+                subject: this.subject.value,
+                message: this.message.value,
+                to_email: "aashis5657@gmail.com"
             })
-            .then(response => response.text())
-            .then(data => {
-                responseMessage.innerHTML = data;
-                responseMessage.style.color = data.includes('successfully') ? 'green' : 'red';
+            .then(function(response) {
+                responseMessage.innerHTML = 'Message sent successfully!';
+                responseMessage.style.color = 'green';
                 // Clear the form on success
-                if (data.includes('successfully')) {
-                    this.reset();
-                }
-            })
-            .catch(error => {
-                responseMessage.innerHTML = 'An error occurred. Please try again.';
+                document.getElementById('contactForm').reset();
+            }, function(error) {
+                responseMessage.innerHTML = 'Message sending failed. Please try again.';
                 responseMessage.style.color = 'red';
             });
         });
